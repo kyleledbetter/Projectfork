@@ -23,9 +23,12 @@ $details_in     = ($state->get('project.request') ? 'in ' : '');
 $details_active = ($state->get('project.request') ? ' active' : '');
 ?>
 <style type="text/css">
-.row-tasks .btn {
-	margin-right: 10px;
-}
+	.row-tasks .btn {
+		margin-right: 10px;
+	}
+	.row-activity .thumbnail.pull-left {
+		margin-bottom: 0;
+	}
 </style>
 <div id="projectfork" class="category-list<?php echo $this->pageclass_sfx;?> view-dashboard">
 
@@ -170,7 +173,7 @@ $details_active = ($state->get('project.request') ? ' active' : '');
 						</ul>
         			</div>
         		</div>
-        		<div class="row-striped">
+        		<div class="row-striped row-activity">
         			<div class="row-fluid">
         				<a href="#"><img src="<?php echo JURI::base(true);?>/media/com_projectfork/projectfork/images/icons/avatar.jpg" class="thumbnail pull-left" height="32" width="32"></a> 
         				<span class="small muted pull-right">3 minutes ago</span>
@@ -200,6 +203,9 @@ $details_active = ($state->get('project.request') ? ' active' : '');
         				<span class="small muted pull-right">1 week ago</span>
         				<h4><a href="#">Firstname Lastname</a></h4>
         					edited a <span class="label"><span aria-hidden="true" class="icon-comment"></span> discussion</span> <a href="#">Discussion Name</a>
+        			</div>
+        			<div class="row-fluid center">
+        				<a href="#" class="btn btn-primary"><span aria-hidden="true" class="icon-arrow-down"></span> More</a>
         			</div>
         		</div>
         		<!-- End Placeholder -->
