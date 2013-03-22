@@ -4,7 +4,7 @@
  * @subpackage   Tasks
  *
  * @author       Tobias Kuhn (eaxs)
- * @copyright    Copyright (C) 2006-2012 Tobias Kuhn. All rights reserved.
+ * @copyright    Copyright (C) 2006-2013 Tobias Kuhn. All rights reserved.
  * @license      http://www.gnu.org/licenses/gpl.html GNU/GPL, see LICENSE.txt
  */
 
@@ -26,682 +26,124 @@ $can_order    = $user->authorise('core.edit.state', 'com_pftasks');
 
 $repo_enabled  = PFApplicationHelper::enabled('com_pfrepo');
 $cmnts_enabled = PFApplicationHelper::enabled('com_pfcomments');
+$time_enabled  = PFApplicationHelper::enabled('com_pftime');
+$can_track     = ($user->authorise('core.create', 'com_pftime') && $time_enabled);
 ?>
-<?php if ($uid && $this->state->get('filter.project') && $can_order) : ?>
 <script type="text/javascript">
 jQuery(document).ready(function() {
-    PFlist.sortable('.list-tasks', 'tasks');
+    <?php if ($can_track) : ?>
+        var turl  = '<?php echo JRoute::_('index.php?option=com_pftime&task=recorder.add&tmpl=component', false); ?>';
+        var topts = 'width=500,height=600,resizable=yes,'
+                  + 'scrollbars=yes,toolbar=no,location=no,'
+                  + 'directories=no,status=no,menubar=no';
+
+        PFtask.setTimeTracker(turl, topts);
+    <?php endif; ?>
+
+    <?php if ($uid && $this->state->get('filter.project') && $can_order) : ?>
+        PFlist.sortable('.list-tasks', 'tasks');
+    <?php endif; ?>
 });
 </script>
-<?php endif; ?>
+<style type="text/css">
+	.text-medium {
+		font-size: 14px;
+	}
+	.icon-cancel-2.pull-right {
+		margin-left: 5px;
+	}
+	.row-tags .btn {
+		margin-bottom: 10px;
+	}
+	.row-tags .label {
+		position: relative;
+		top: 1px;
+		left: 3px;
+	}
+	.row-tasks .btn {
+		margin-right: 10px;
+	}
+	.row-activity .thumbnail.pull-left {
+		margin-bottom: 0;
+	}
+	.row-danger {
+		-moz-box-shadow: inset 2px 0 0 #b94a48;
+		-webkit-box-shadow: inset 2px 0 0 #b94a48;
+		box-shadow: inset 2px 0 0 #b94a48;
+	}
+	.row-warning {
+		-moz-box-shadow: inset 2px 0 0 #c09853;
+		-webkit-box-shadow: inset 2px 0 0 #c09853;
+		box-shadow: inset 2px 0 0 #c09853;
+	}
+	.row-info {
+		-moz-box-shadow: inset 2px 0 0 #3a87ad;
+		-webkit-box-shadow: inset 2px 0 0 #3a87ad;
+		box-shadow: inset 2px 0 0 #3a87ad;
+	}
+	.row-inverse {
+		-moz-box-shadow: inset 2px 0 0 #363636;
+		-webkit-box-shadow: inset 2px 0 0 #363636;
+		box-shadow: inset 2px 0 0 #363636;
+	}
+	.row-primary {
+		-moz-box-shadow: inset 2px 0 0 #006DCC;
+		-webkit-box-shadow: inset 2px 0 0 #006DCC;
+		box-shadow: inset 2px 0 0 #006DCC;
+	}
+	.row-success {
+		-moz-box-shadow: inset 2px 0 0 #468847;
+		-webkit-box-shadow: inset 2px 0 0 #468847;
+		box-shadow: inset 2px 0 0 #468847;
+	}
+	.reveal {
+		visibility: hidden;
+	}
+	.task-item:hover .reveal {
+		visibility: visible;
+	}
+	
+	.flip {
+	  -webkit-perspective: 800;
+	   width: 100%;
+	   height: 22px;
+	    position: relative;
+	}
+	.flip .card.flipped {
+	  -webkit-transform: rotateX(180deg);
+	}
+	.flip .card {
+	  width: 100%;
+	  height: 100%;
+	  -webkit-transform-style: preserve-3d;
+	  -webkit-transition: 0.5s;
+	}
+	.flip .card .face {
+	  width: 100%;
+	  height: 100%;
+	  position: absolute;
+	  -webkit-backface-visibility: hidden ;
+	  z-index: 2;
+	}
+	.flip .card .front {
+	  position: absolute;
+	  z-index: 1;
+	    cursor: pointer;
+	}
+	.flip .card .back {
+	  -webkit-transform: rotateX(180deg);
+	    cursor: pointer;
+	}​
+</style>
 <div id="projectfork" class="category-list<?php echo $this->pageclass_sfx;?> view-tasks">
 
     <?php if ($this->params->get('show_page_heading', 1)) : ?>
         <h1><?php echo $this->escape($this->params->get('page_heading')); ?></h1>
     <?php endif; ?>
-    
-    <!-- Begin Placeholder -->
-    <style type="text/css">
-    	.text-medium {
-    		font-size: 14px;
-    	}
-    	.icon-cancel-2.pull-right {
-    		margin-left: 5px;
-    	}
-    	.row-tags .btn {
-    		margin-bottom: 10px;
-    	}
-    	.row-tags .label {
-    		position: relative;
-    		top: 1px;
-    		left: 3px;
-    	}
-    	.row-tasks .btn {
-    		margin-right: 10px;
-    	}
-    	.row-activity .thumbnail.pull-left {
-    		margin-bottom: 0;
-    	}
-    	.row-danger {
-    		-moz-box-shadow: inset 2px 0 0 #b94a48;
-    		-webkit-box-shadow: inset 2px 0 0 #b94a48;
-    		box-shadow: inset 2px 0 0 #b94a48;
-    	}
-    	.row-warning {
-    		-moz-box-shadow: inset 2px 0 0 #c09853;
-    		-webkit-box-shadow: inset 2px 0 0 #c09853;
-    		box-shadow: inset 2px 0 0 #c09853;
-    	}
-    	.row-info {
-    		-moz-box-shadow: inset 2px 0 0 #3a87ad;
-    		-webkit-box-shadow: inset 2px 0 0 #3a87ad;
-    		box-shadow: inset 2px 0 0 #3a87ad;
-    	}
-    	.row-inverse {
-    		-moz-box-shadow: inset 2px 0 0 #363636;
-    		-webkit-box-shadow: inset 2px 0 0 #363636;
-    		box-shadow: inset 2px 0 0 #363636;
-    	}
-    	.row-primary {
-    		-moz-box-shadow: inset 2px 0 0 #006DCC;
-    		-webkit-box-shadow: inset 2px 0 0 #006DCC;
-    		box-shadow: inset 2px 0 0 #006DCC;
-    	}
-    	.row-success {
-    		-moz-box-shadow: inset 2px 0 0 #468847;
-    		-webkit-box-shadow: inset 2px 0 0 #468847;
-    		box-shadow: inset 2px 0 0 #468847;
-    	}
-    	.reveal {
-    		visibility: hidden;
-    	}
-    	.row-tasks .row-fluid:hover .reveal {
-    		visibility: visible;
-    	}
-    	
-    	.flip {
-    	  -webkit-perspective: 800;
-    	   width: 100%;
-    	   height: 22px;
-    	    position: relative;
-    	}
-    	.flip .card.flipped {
-    	  -webkit-transform: rotateX(180deg);
-    	}
-    	.flip .card {
-    	  width: 100%;
-    	  height: 100%;
-    	  -webkit-transform-style: preserve-3d;
-    	  -webkit-transition: 0.5s;
-    	}
-    	.flip .card .face {
-    	  width: 100%;
-    	  height: 100%;
-    	  position: absolute;
-    	  -webkit-backface-visibility: hidden ;
-    	  z-index: 2;
-    	}
-    	.flip .card .front {
-    	  position: absolute;
-    	  z-index: 1;
-    	    cursor: pointer;
-    	}
-    	.flip .card .back {
-    	  -webkit-transform: rotateX(180deg);
-    	    cursor: pointer;
-    	}​
-    </style>
-    <div class="row-fluid">
-    	<div class="span8">
-    		<form class="form-inline">
-    			<input type="text" class="input-medium" placeholder="Task Name">
-    			<input type="text" class="input-small" placeholder="due on">
-    			<input type="text" class="input-small" placeholder="in List Name">
-    			<a href="#task1" data-toggle="collapse" class="btn btn-primary">Add Task</a>
-    		</form>
-    		<a href="#list1" data-toggle="collapse"><h3><span aria-hidden="true" class="icon-menu-2"></span> List One</h3></a>
-    		<div id="list1" class="collapse in">
-    			<div class="row-striped row-tasks">
-    				<div class="row-fluid row-danger">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due 3 weeks ago</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-danger">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due 2 days ago</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-warning">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due today</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-warning">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due tomorrow</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-primary">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due in 2 days</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-info">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due in 4 days</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-success">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due in 3 days</span>
-    					    		<a href="#" class="btn btn-micro pull-left active"><span aria-hidden="true" class="icon-checkbox"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-success">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due tomorrow</span>
-    					    		<a href="#" class="btn btn-micro pull-left active"><span aria-hidden="true" class="icon-checkbox"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-success">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due yesterday</span>
-    					    		<a href="#" class="btn btn-micro pull-left active"><span aria-hidden="true" class="icon-checkbox"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    			</div>
-    		</div>
-    		<a href="#list2" data-toggle="collapse"><h3><span aria-hidden="true" class="icon-menu-2"></span> List Two</h3></a>
-    		<div id="list2" class="collapse in">
-    			<div class="row-striped row-tasks">
-    				<div class="row-fluid row-danger">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due 2 days ago</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-warning">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due today</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-primary">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due in 2 days</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-info">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due in 4 days</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-success">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due in 3 days</span>
-    					    		<a href="#" class="btn btn-micro pull-left active"><span aria-hidden="true" class="icon-checkbox"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-success">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due yesterday</span>
-    					    		<a href="#" class="btn btn-micro pull-left active"><span aria-hidden="true" class="icon-checkbox"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    			</div>
-    		</div>
-    		<a href="#list3" data-toggle="collapse"><h3><span aria-hidden="true" class="icon-menu-2"></span> List Three</h3></a>
-    		<div id="list3" class="collapse in">
-    			<div class="row-striped row-tasks">
-    				<div class="row-fluid row-primary">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due in 2 days</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-info">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due in 4 days</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-success">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due in 3 days</span>
-    					    		<a href="#" class="btn btn-micro pull-left active"><span aria-hidden="true" class="icon-checkbox"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    			</div>
-    		</div>
-    		<a href="#list4" data-toggle="collapse"><h3><span aria-hidden="true" class="icon-menu-2"></span> List Four</h3></a>
-    		<div id="list4" class="collapse in">
-    			<div class="row-striped row-tasks">
-    				<div class="row-fluid row-danger">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due 2 days ago</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-warning">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due today</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-warning">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due tomorrow</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-primary">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due in 2 days</span>
-    					    		<a href="#" class="btn btn-micro pull-left"><span aria-hidden="true" class="icon-checkbox-unchecked"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-success">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due in 3 days</span>
-    					    		<a href="#" class="btn btn-micro pull-left active"><span aria-hidden="true" class="icon-checkbox"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    				<div class="row-fluid row-success">
-    					<div class="flip"> 
-    					    <div class="card"> 
-    					    	<div class="face front">
-    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
-    					    		<span class="small muted pull-right">due tomorrow</span>
-    					    		<a href="#" class="btn btn-micro pull-left active"><span aria-hidden="true" class="icon-checkbox"></span></a> 
-    					    		<span class="text-medium"><a href="#">Task name</a></span> <a href="#"><span aria-hidden="true" class="icon-pencil muted reveal"></span></a>
-    					    	</div>
-    					    	<div class="face back">
-    					    		<div class="form-inline">
-    					    			<a href="#" class="btn btn-small active pull-right"><span aria-hidden="true" class="icon-mail"></span> subscribed</a>
-    					    			<input type="checkbox" name="" value=""/>
-    					    			<input type="text" class="input-medium" value="Task Name">
-    					    			<input type="text" class="input-medium" value="Firstname Lastname">
-    					    			<input type="text" class="input-small" value="12/08/2012">
-    					    		</div>
-    					    	</div>
-    					    </div>
-    					</div>
-    				</div>
-    			</div>
-    		</div>
-    	</div>
-    	<div class="span4">
-    		<h3>Task Lists</h3>
-    		<ul class="nav nav-tabs nav-stacked">
-    			<li class="active"><a href="#"><span aria-hidden="true" class="icon-list-view"></span> All Lists</a></li>
-    			<li class=""><a href="#"><span aria-hidden="true" class="icon-list-view"></span> List One</a></li>
-    			<li class=""><a href="#"><span aria-hidden="true" class="icon-list-view"></span> List Two</a></li>
-    			<li class=""><a href="#"><span aria-hidden="true" class="icon-list-view"></span> List Three</a></li>
-    			<li class=""><a href="#"><span aria-hidden="true" class="icon-list-view"></span> List Four</a></li>
-    		</ul>
-    		<h3>Task Urgency</h3>
-    		<ul class="nav nav-tabs nav-stacked">
-    			<li class="active"><a href="#"><span aria-hidden="true" class="icon-drawer-2"></span> All</a></li>
-    			<li class=""><a href="#"><span aria-hidden="true" class="icon-warning"></span> Overdue</a></li>
-    			<li class=""><a href="#"><span aria-hidden="true" class="icon-lightning"></span> Today</a></li>
-    			<li class=""><a href="#"><span aria-hidden="true" class="icon-pin"></span> Tomorrow</a></li>
-    			<li class=""><a href="#"><span aria-hidden="true" class="icon-calendar"></span> Future</a></li>
-    		</ul>
-    		<h3>Task Tags</h3>
-    		<div class="row-tags">
-    			<a href="#" class="btn btn-small">design <span class="label label-info">42</span></a> <a href="#" class="btn btn-small">development <span class="label label-info">37</span></a> <a href="#" class="btn btn-small">ui <span class="label label-info">32</span></a> <a href="#" class="btn btn-small">ux <span class="label label-info">29</span></a> <a href="#" class="btn btn-small">php <span class="label label-info">26</span></a> <a href="#" class="btn btn-small">css <span class="label label-info">23</span></a> <a href="#" class="btn btn-small">joomla <span class="label label-info">19</span></a> <a href="#" class="btn btn-small">deliverable <span class="label label-info">16</span></a> <a href="#" class="btn btn-small">bug <span class="label label-info">13</span></a> <a href="#" class="btn btn-small">feature <span class="label label-info">11</span></a> <a href="#" class="btn btn-small">employees <span class="label label-info">5</span></a> <a href="#" class="btn btn-small">marketing <span class="label label-info">3</span></a>    		
-    		</div>
-    	</div>
-    </div>
-    
-    <script>
-    	!function ($) {
-    		$('.flip').click(function(){
-    			$(this).find('.card').addClass('flipped').mouseleave(function(){
-    				$(this).removeClass('flipped');
-    			});
-    			return false;
-    		})
-    	}(window.jQuery)
-    </script>
-	<!-- End Placeholder -->
+
     <div class="clearfix"></div>
 
-    <div class="cat-items" style="display: none;">
+    <div class="cat-items">
         <form id="adminForm" name="adminForm" method="post" action="<?php echo htmlspecialchars(JFactory::getURI()->toString()); ?>">
             <div class="btn-toolbar btn-toolbar-top">
                 <?php echo $this->toolbar;?>
@@ -815,24 +257,20 @@ jQuery(document).ready(function() {
                         ?>
                         <div class="cat-list-row<?php echo $k;?>">
                         	<?php if ($item->list_title) : ?>
-	                            <div class="list-title btn-toolbar">
-	                            	<div class="btn-group">
-		                                <h3>
-		                                    <a href="<?php echo JRoute::_(PFtasksHelperRoute::getTasksRoute($item->project_slug, $item->milestone_slug, $item->list_slug));?>">
-		                                        <?php echo $this->escape($item->list_title);?>
-		                                    </a>
-		                                    <small><?php echo $this->escape($item->list_description);?></small>
-		                                </h3>
-	                            	</div>
-                                    <?php
-                                        $this->menu->start(array('class' => 'btn-mini'));
-                                        $this->menu->itemEdit('tasklistform', $item->list_id, ($can_edit || $can_edit_own));
-                                        $this->menu->itemTrash('tasklists', $x, ($can_edit || $can_edit_own));
-                                        $this->menu->end();
-                                        echo $this->menu->render(array('class' => 'btn-mini'));
-                                    ?>
-	                                <div class="clearfix"></div>
-	                            </div>
+                               <?php
+                                    $this->menu->start(array('class' => 'btn-mini', 'pull' => 'right'));
+                                    $this->menu->itemEdit('tasklistform', $item->list_id, ($can_edit || $can_edit_own));
+                                    $this->menu->itemTrash('tasklists', $x, ($can_edit || $can_edit_own));
+                                    $this->menu->end();
+                                    echo $this->menu->render(array('class' => 'btn-mini', 'pull' => 'right'));
+                               ?>
+                               <h3>
+		                          <a href="<?php echo JRoute::_(PFtasksHelperRoute::getTasksRoute($item->project_slug, $item->milestone_slug, $item->list_slug));?>">
+		                              <?php echo $this->escape($item->list_title);?>
+		                          </a>
+	                           </h3>
+                               <small><?php echo $this->escape($item->list_description);?></small>
+                               <div class="clearfix clr"></div>
                             <?php endif; ?>
                             <ul class="list-tasks list-striped list-condensed unstyled" id="tasklist_<?php echo $i;?>">
                         <?php
@@ -875,69 +313,98 @@ jQuery(document).ready(function() {
                             $watch = JHtml::_('pfhtml.button.watch', 'tasks', $x, $item->watching, $options);
                         }
                     ?>
-                    <li id="list-item-<?php echo $x; ?>" class="<?php echo $class;?>">
+                    <li id="list-item-<?php echo $x; ?>" class="task-item <?php echo $class;?>">
                         <input type="hidden" name="order[]" value="<?php echo (int) $item->ordering;?>"/>
-
-                        <div id="list-toolbar-<?php echo $x; ?>" class="btn-toolbar <?php if ($item->complete) : echo "complete"; endif;?>">
-                            <?php if ($can_change) : ?>
-                                <label for="cb<?php echo $x; ?>" class="checkbox pull-left">
-                                    <?php echo JHtml::_('pf.html.id', $x, $item->id); ?>
-                                </label>
-                            <?php endif; ?>
-                            <div class="btn-group">
-                                <?php echo JHtml::_('pftasks.complete', $x, $item->complete, $can_change, $item->dependencies, $item->users, $item->start_date); ?>
-                            </div>
-                            <?php
-                                $this->menu->start(array('class' => 'btn-mini'));
-                                $this->menu->itemEdit('taskform', $item->id, ($can_edit || $can_edit_own));
-                                $this->menu->itemTrash('tasks', $x, ($can_edit || $can_edit_own));
-
-                                if (($can_edit || $can_edit_own)) {
-                                    $itm_icon = 'icon-plus';
-                                    $itm_txt  = 'COM_PROJECTFORK_ASSIGN_TO_USER';
-                                    $itm_link = PFusersHelperRoute::getUsersRoute() . '&amp;layout=modal&amp;tmpl=component&amp;field=PFtaskAssignUser';
-
-                                    $this->menu->itemDivider();
-                                    $this->menu->itemModal($itm_icon, $itm_txt, $itm_link, "PFlist.setTarget(" . $x . ");");
-                                }
-
-                                if ($can_change) {
-                                    $itm_icon = 'icon-warning';
-                                    $itm_pfx  = 'COM_PROJECTFORK_PRIORITY';
-                                    $itm_ac   = 'PFtask.priority(' . $x . ',';
-
-                                    $this->menu->itemDivider();
-                                    $this->menu->itemJavaScript($itm_icon, $itm_pfx. '_VERY_LOW', $itm_ac . ' 1, \'' . addslashes(JText::_($itm_pfx. '_VERY_LOW')) . '\')');
-                                    $this->menu->itemJavaScript($itm_icon, $itm_pfx. '_LOW', $itm_ac . ' 2, \'' . addslashes(JText::_($itm_pfx. '_LOW')) . '\')');
-                                    $this->menu->itemJavaScript($itm_icon, $itm_pfx. '_MEDIUM', $itm_ac . ' 3, \'' . addslashes(JText::_($itm_pfx. '_MEDIUM')) . '\')');
-                                    $this->menu->itemJavaScript($itm_icon, $itm_pfx. '_HIGH', $itm_ac . ' 4, \'' . addslashes(JText::_($itm_pfx. '_HIGH')) . '\')');
-                                    $this->menu->itemJavaScript($itm_icon, $itm_pfx. '_VERY_HIGH', $itm_ac . ' 5, \'' . addslashes(JText::_($itm_pfx. '_VERY_HIGH')) . '\')');
-                                }
-
-                                $this->menu->end();
-
-                                echo $this->menu->render(array('class' => 'btn-mini'));
-                            ?>
-                            <div class="btn-group">
-                                <h5 class="task-title">
-                                    <a href="<?php echo JRoute::_(PFtasksHelperRoute::getTaskRoute($item->slug, $item->project_slug, $item->milestone_slug, $item->list_slug));?>">
-                                        <?php if ($item->checked_out) : ?><i class="icon-lock"></i> <?php endif; ?>
-                                        <?php echo $this->escape($item->title);?>
-                                    </a>
-                                </h5>
-                            </div>
-                            <div class="btn-group">
-                                <small><?php echo $this->escape(JHtml::_('pf.html.truncate', $item->description));?></small>
-                                <?php echo JHtml::_('pftasks.assignedLabel', $item->id, $x, $item->users); ?>
-                                <?php echo JHtml::_('pftasks.priorityLabel', $item->id, $x, $item->priority); ?>
-                                <?php echo JHtml::_('pfhtml.label.datetime', $item->end_date); ?>
-                                <?php echo JHtml::_('pfhtml.label.access', $item->access); ?>
-                                <?php if ($cmnts_enabled) : echo JHtml::_('pfcomments.label', $item->comments); endif; ?>
-                                <?php if ($repo_enabled) : echo JHtml::_('pfrepo.attachmentsLabel', $item->attachments); endif; ?>
-                                <?php if ($item->label_count) : echo JHtml::_('pfhtml.label.labels', $item->labels); endif; ?>
-                            </div>
-                            <?php echo $watch; ?>
-                        </div>
+                        
+                        <div class="flip"> 
+    					    <div class="card"> 
+    					    	<div class="face front">
+    					    		<a href="#"><span aria-hidden="true" class="icon-cancel-2 muted reveal pull-right"></span></a>
+    					    		<span class="small muted pull-right">due <?php echo JHtml::_('pfhtml.label.datetime', $item->end_date); ?></span>
+    					    		<span class="text-medium">
+	    					    			<?php if ($item->checked_out) : ?><i class="icon-lock"></i> <?php endif; ?>
+	    					    			<?php echo $this->escape($item->title);?>
+	    					    	</span> 
+	    					    	<div id="list-toolbar-<?php echo $x; ?>" class="pull-left <?php if ($item->complete) : echo "complete"; endif;?>">
+			                            <?php if ($can_change) : ?>
+			                                <label for="cb<?php echo $x; ?>" class="checkbox pull-left">
+			                                    <?php echo JHtml::_('pf.html.id', $x, $item->id); ?>
+			                                </label>
+			                            <?php endif; ?>
+			                            <div class="btn-group pull-left">
+			                                <?php echo JHtml::_('pftasks.complete', $x, $item->complete, $can_change, $item->dependencies, $item->users, $item->start_date); ?>
+			                            </div>
+			                            <div class="btn-group pull-left">
+			                            	<?php
+				                                $this->menu->start(array('class' => 'btn-mini'));
+				                                $this->menu->itemEdit('taskform', $item->id, ($can_edit || $can_edit_own));
+				                                $this->menu->itemTrash('tasks', $x, ($can_edit || $can_edit_own));
+			
+			                                    if ($can_track) {
+			                                        $this->menu->itemDivider();
+			                                        $this->menu->itemJavaScript('icon-clock ', 'COM_PROJECTFORK_TASKS_TRACK_TIME', 'PFtask.trackItem(' . $item->id . ');');
+			                                    }
+			
+				                                if (($can_edit || $can_edit_own)) {
+				                                    $itm_icon = 'icon-plus';
+				                                    $itm_txt  = 'COM_PROJECTFORK_ASSIGN_TO_USER';
+				                                    $itm_link = PFusersHelperRoute::getUsersRoute() . '&amp;layout=modal&amp;tmpl=component&amp;field=PFtaskAssignUser';
+			
+				                                    $this->menu->itemDivider();
+				                                    $this->menu->itemModal($itm_icon, $itm_txt, $itm_link, "PFlist.setTarget(" . $x . ");");
+				                                }
+			
+				                                if ($can_change) {
+				                                    $itm_icon = 'icon-warning';
+				                                    $itm_pfx  = 'COM_PROJECTFORK_PRIORITY';
+				                                    $itm_ac   = 'PFtask.priority(' . $x . ',';
+			
+				                                    $this->menu->itemDivider();
+				                                    $this->menu->itemJavaScript($itm_icon, $itm_pfx. '_VERY_LOW', $itm_ac . ' 1, \'' . addslashes(JText::_($itm_pfx. '_VERY_LOW')) . '\')');
+				                                    $this->menu->itemJavaScript($itm_icon, $itm_pfx. '_LOW', $itm_ac . ' 2, \'' . addslashes(JText::_($itm_pfx. '_LOW')) . '\')');
+				                                    $this->menu->itemJavaScript($itm_icon, $itm_pfx. '_MEDIUM', $itm_ac . ' 3, \'' . addslashes(JText::_($itm_pfx. '_MEDIUM')) . '\')');
+				                                    $this->menu->itemJavaScript($itm_icon, $itm_pfx. '_HIGH', $itm_ac . ' 4, \'' . addslashes(JText::_($itm_pfx. '_HIGH')) . '\')');
+				                                    $this->menu->itemJavaScript($itm_icon, $itm_pfx. '_VERY_HIGH', $itm_ac . ' 5, \'' . addslashes(JText::_($itm_pfx. '_VERY_HIGH')) . '\')');
+				                                }
+			
+				                                $this->menu->end();
+			
+				                                echo $this->menu->render(array('class' => 'btn-mini'));
+				                            ?>
+			                            </div>
+			                        </div>
+	    					    	<?php if ($can_edit || $can_edit_own) : ?>
+	    	    	    			    <a href="<?php echo JRoute::_('index.php?option=com_pftasks&task=form.edit&id=' . $item->slug);?>">
+	    	    	    			    	<span aria-hidden="true" class="icon-pencil muted reveal"></span>
+	    	    	    			    </a>
+			    	    			<?php endif; ?>
+    					    	</div>
+    					    	<div class="face back">
+    					    		<div class="form-inline">
+    					    			<?php if ($can_change) : ?>
+			                                <label for="cb<?php echo $x; ?>" class="checkbox pull-left">
+			                                    <?php echo JHtml::_('pf.html.id', $x, $item->id); ?>
+			                                </label>
+			                            <?php endif; ?>
+    					    			<?php echo $watch; ?>
+    					    			<a href="<?php echo JRoute::_(PFtasksHelperRoute::getTaskRoute($item->slug, $item->project_slug, $item->milestone_slug, $item->list_slug));?>">
+	    					    			View details
+	    					    		</a>
+	    					    		<small class="task-description"><?php echo $this->escape(JHtml::_('pf.html.truncate', $item->description));?></small>
+				                        <?php echo JHtml::_('pftasks.assignedLabel', $item->id, $x, $item->users); ?>
+				                        <?php echo JHtml::_('pftasks.priorityLabel', $item->id, $x, $item->priority); ?>
+				                        <?php echo JHtml::_('pfhtml.label.datetime', $item->end_date); ?>
+				                        <?php if ($item->access != 1) {
+				                        	echo JHtml::_('pfhtml.label.access', $item->access);
+				                        	}
+				                        ?>
+				                        <?php if ($cmnts_enabled) : echo JHtml::_('pfcomments.label', $item->comments); endif; ?>
+				                        <?php if ($repo_enabled) : echo JHtml::_('pfrepo.attachmentsLabel', $item->attachments); endif; ?>
+				                        <?php if ($item->label_count) : echo JHtml::_('pfhtml.label.labels', $item->labels); endif; ?>
+    					    		</div>
+    					    	</div>
+    					    </div>
+    					</div>
                     </li>
                 <?php
                     $x++;
@@ -950,6 +417,31 @@ jQuery(document).ready(function() {
                 <?php $list_open = false; endif; ?>
             </div>
 
+            <?php if ($can_order) : ?>
+                <?php if (!$this->state->get('filter.project')) : ?>
+                    <div class="alert"><?php echo JText::_('COM_PROJECTFORK_REORDER_DISABLED'); ?></div>
+                <?php else: ?>
+                    <div class="alert alert-success"><?php echo JText::_('COM_PROJECTFORK_REORDER_ENABLED'); ?></div>
+                <?php endif; ?>
+            <?php endif; ?>
+
+            <?php if ($this->pagination->get('pages.total') > 1) : ?>
+                <div class="pagination center">
+                    <?php echo $this->pagination->getPagesLinks(); ?>
+                </div>
+                <p class="counter center">
+                	<?php echo $this->pagination->getPagesCounter(); ?>
+                </p>
+            <?php endif; ?>
+
+            <?php if (!$this->state->get('filter.project')) : ?>
+                <div class="filters center">
+                    <span class="display-limit">
+                        <?php echo $this->pagination->getLimitBox(); ?>
+                    </span>
+                </div>
+            <?php endif; ?>
+
             <input type="hidden" id="boxchecked" name="boxchecked" value="0" />
             <input type="hidden" id="target-item" name="target_item" value="0" />
             <input type="hidden" name="filter_order" value="<?php echo $list_order; ?>" />
@@ -958,11 +450,14 @@ jQuery(document).ready(function() {
             <?php echo JHtml::_('form.token'); ?>
         </form>
     </div>
-    <?php /* if ($can_order) : ?>
-        <?php if (!$this->state->get('filter.project')) : ?>
-            <div class="alert"><?php echo JText::_('COM_PROJECTFORK_REORDER_DISABLED'); ?></div>
-        <?php else: ?>
-            <div class="alert alert-success"><?php echo JText::_('COM_PROJECTFORK_REORDER_ENABLED'); ?></div>
-        <?php endif; ?>
-    <?php endif; */ ?>
 </div>
+<script>
+	!function ($) {
+		$('.flip').click(function(){
+			$(this).find('.card').addClass('flipped').mouseleave(function(){
+				$(this).removeClass('flipped');
+			});
+			return false;
+		})
+	}(window.jQuery)
+</script>
